@@ -1,0 +1,38 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>PGM-EDIT</title>
+    <meta name="description" content="Create, Edit, Save and Open PGM files">
+    <meta name="author" content="matt.walsh">
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <h1>
+        PGM-EDIT
+    </h1>
+    <div class="file-info">
+        <div class="file-name">File Name: <span id="file-name"></span></div>
+        <div class="file-type">File Type: <span id="filetype"></span></div>
+        <div class="resolution">Resolution: <span id="resolution"></span></div>
+    </div>
+    <div class="canvas-area">
+        <canvas id="image-canvas">
+            This page requires that you are using a modern browser and have javascript enabled.
+        </canvas>
+    </div>
+    <input type="file" accept="image/.pbm" onchange="HandleFile(this.files)">
+    <script src="js/errors.js"></script>
+    <script src="js/canvasInterface.js"></script>
+    <script src="js/pnm.js"></script>
+    <script src="js/scripts.js"></script>
+</body>
+</html>
