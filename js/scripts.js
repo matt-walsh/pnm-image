@@ -1,27 +1,20 @@
 "use strict";
 //TESTING VARS
-var CANVAS_HEIGHT = 800;
-var CANVAS_WIDTH = 800;
+
 
 
 //PBM Object
 var image;
+var canvasWriter;
 var canvas;
+var context;
+
 //Initialize canvas
 window.onload = (function(){
     canvas = document.getElementById("image-canvas");
     if(canvas !== undefined){
-        //@ts-ignore
-        canvas.height = CANVAS_HEIGHT;
-        //@ts-ignore
-        canvas.width = CANVAS_WIDTH;
-        //@ts-ignore
         if (canvas.getContext) {
-            //@ts-ignore
-            var context = canvas.getContext('2d');
-
-            context.fillStyle = '#369';
-            context.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
+            context = canvas.getContext('2d');
         }
     }
 })
@@ -42,7 +35,7 @@ function HandleFile(file){
 
 function DrawImage(image){
     console.log(image);
-    canvas.width = image.GetWidth();
-    canvas.height = image.GetHeight();
-    canvas.getContext('2d').fillRect(0,0,canvas.width, canvas.height)
+    canvasWriter = new CanvasWriter(context,10,image.GetWidth(),image.GetHeight());
+    canvasWriter.Draw(image.GetImageData());
+
 }

@@ -40,7 +40,8 @@ class ImageMapFactory{
                 }
                 imageData.push(rowArray);
             }
-        }else if(magicNumber === "P3" || magicNumber === "P6"){
+        }
+        else if(magicNumber === "P3" || magicNumber === "P6"){
             for(let i = startingIndex; i < splitFileString.length; i++){
                 let rowArray = new Array();
                 let colorArray = new Array();
@@ -55,7 +56,7 @@ class ImageMapFactory{
                                 'r': colorArray[0],
                                 'g': colorArray[1],
                                 'b': colorArray[2]
-                            }
+                            };
                             rowArray.push(pixelData);
 
                             //reset counter and color array
@@ -127,8 +128,8 @@ class PortableImageMap{
         this.imageData = imageData;
     }
 
-    GetPixel(x,y){
-        return this.imageData[x][y];
+    GetImageData(x,y){
+        return this.imageData;
     }
 
     GetMagicNumber(){
@@ -166,7 +167,7 @@ class PortableGreyMap extends PortableImageMap{
         catch(error){
             console.log(error);
         }
-
+        this.maxGreyValue = maxGreyValue;
         super(magicNumber, width, height, imageData);
     }
 }
