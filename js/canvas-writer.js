@@ -7,7 +7,16 @@ class CanvasWriter{
     }
 
     Draw(image){
-        
+        let magicNumber = image.GetMagicNumber();      
+        if(magicNumber === "P1" || magicNumber === "P4"){
+            this.WriteMonochromeArrayToCanvas(image.GetImageData());        
+        }
+        else if(magicNumber === "P2" || magicNumber === "P5"){
+            this.WriteGreyscaleArrayToCanvas(image.GetImageData(), image.GetMaxGreyValue());
+        }
+        else if(magicNumber === "P3" || magicNumber === "P6"){
+            this.WriteColorArrayToCanvas(image.GetImageData(), image.GetMaxColorValue());
+        }
     }
 
     WriteMonochromeArrayToCanvas(dataArray){
@@ -30,15 +39,15 @@ class CanvasWriter{
         for(let row = 0; row < this.height; row++){
             for(let col = 0; col < this.width; col++){
                 let intensity = Math.round((dataArray[row][col] / maxValue) * 255);
-                this.context.fillStyle = "#" + ConvertToHex(intensity, intensity, intensity);
+                this.context.fillStyle = "#" + this.ConvertToHex(intensity, intensity, intensity);
 
-                this.context.fillRect(row * this.pixelFactor ,col * this.pixelFactor , 
+                this.context.fillRect(col * this.pixelFactor ,row * this.pixelFactor , 
                 this.pixelFactor, this.pixelFactor);
             }
         }      
     }
 
-    WriteColorArrayToCanvas(dataArray, colorFactor){
+    WriteColorArrayToCanvas(dataArray, maxValue){
 
     }
 

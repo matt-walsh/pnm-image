@@ -10,16 +10,16 @@ class ImageMapFactory{
         let magicNumber = splitFileString[0];
         
         //Capture resolution
-        let resolutionString = splitFileString[1].split(" ");
-        let width = parseInt(resolutionString[0]);
-        let height = parseInt(resolutionString[1]);
+        let resolutionArray = splitFileString[1].split(" ");
+        let width = parseInt(resolutionArray[0]);
+        let height = parseInt(resolutionArray[1]);
 
         //Handle format specific data
         let extraData = 0;
         let startingIndex = 3;
 
         if(magicNumber == "P1"){
-            //monochrome pixel data starts on index 2
+            //monochrome pixel data starts at index 2
             startingIndex = 2;
         }
         else{
@@ -30,6 +30,7 @@ class ImageMapFactory{
         //Extract image data, depending on image format
         let imageData = new Array();
 
+        //Monochrome
         if(magicNumber === "P1" || magicNumber === "P4"){
             for(let i = startingIndex; i < splitFileString.length; i++){
                 let rowArray = new Array()
@@ -40,17 +41,46 @@ class ImageMapFactory{
                 }
                 imageData.push(rowArray);
             }
+
+            return new PortableBitMap(magicNumber, width, height, imageData);
         }
-        else if(magicNumber === "P3" || magicNumber === "P6"){
+        //Greyscale
+        else if(magicNumber === "P2" || magicNumber === "P5"){
+            let numberBuilder = "";
             for(let i = startingIndex; i < splitFileString.length; i++){
                 let rowArray = new Array();
+                for(let j = 0; j < splitFileString[i].length; j++){
+                    if(splitFileString[i][j] !== " " || splitFileString[i][j] !== ""){
+                        if(parseInt(splitFileString[i][j]) < extraData){
+                            numberBuilder += splitFileString[i][j];
+                            if(!parseInt(splitFileString[i][j+1])){
+                                rowArray.push(parseInt(numberBuilder))
+                                numberBuilder = "";
+                            }
+                        }
+                    }
+                }
+                imageData.push(rowArray);
+            }
+
+            return new PortableGreyMap(magicNumber, width, height, extraData, imageData);
+        }
+        //Color
+        else if(magicNumber === "P3" || magicNumber === "P6"){
+            for(let i = startingIndex; i < splitFileString.length; i++){
+                
+                //Holds the final, formatted row to add to imageData
+                let rowArray = new Array();
+                //holds the RGB channels while they are being extracted
                 let colorArray = new Array();
-                let numCount = 0;
+                //Counts how many channels have been captured
+                let channelCount = 0;
+
                 for(let j = 0; j < splitFileString[i].length; j++){
                     if(splitFileString[i][j] !== " "){
-                        numCount++;
+                        channelCount++;
                         colorArray.push(splitFileString[i][j]);
-                        if(numCount >= 3){
+                        if(channelCount >= 3){
                             //create object to hold pixel color values and add to row array
                             let pixelData = {
                                 'r': colorArray[0],
@@ -60,27 +90,20 @@ class ImageMapFactory{
                             rowArray.push(pixelData);
 
                             //reset counter and color array
-                            numCount = 0;
+                            channelCount = 0;
                             colorArray.length = 0;
 
                         }
                     }
                 }
+
+                imageData.push(rowArray);
             }
+
+            return new PortablePixelMap(magicNumber, width, height, extraData, imageData);
         }
         else{
             //ERROR
-        }
-
-        //Create and return new image objects based on the supplied data
-        if(magicNumber === "P1" || magicNumber === "P4"){
-            return new PortableBitMap(magicNumber, width, height, imageData);
-        }
-        else if(magicNumber === "P2" || magicNumber === "P5"){
-            return new PortableGreyMap(magicNumber, width, height, extraData, imageData);
-        }
-        else if(magicNumber === "P3" || magicNumber === "P6"){
-            return new PortablePixelMap(magicNumber, width, height, extraData, imageData);
         }
     }
 
@@ -110,12 +133,13 @@ class ImageMapFactory{
             else if(originalString.charCodeAt(i) >= 48 && originalString.charCodeAt(i) <= 57){
                 newString += originalString.charAt(i); 
             }
+            //space
             else if(originalString.charCodeAt(i) === 32){
                 newString += originalString.charAt(i);                
             }
         }
-
         return newString;
+        
     }
 }
 
@@ -128,7 +152,7 @@ class PortableImageMap{
         this.imageData = imageData;
     }
 
-    GetImageData(x,y){
+    GetImageData(){
         return this.imageData;
     }
 
@@ -153,28 +177,23 @@ class PortableBitMap extends PortableImageMap{
 
 class PortableGreyMap extends PortableImageMap{
     constructor(magicNumber, width, height, maxGreyValue, imageData){
-        //validate imageData
-        try{
-            for(let i = 0; i < imageData.length; i++){
-                for(let j = 0; j < imageData[i].length; j++){
-                    if(imageData[i][j] > maxGreyValue){
-                        throw "ERROR: Grey value out of range"
-                        //ERROR: Grey value is out of bounds
-                    }
-                }
-            }
-        }
-        catch(error){
-            console.log(error);
-        }
-        this.maxGreyValue = maxGreyValue;
         super(magicNumber, width, height, imageData);
+        this.maxGreyValue = maxGreyValue;
+    }
+
+    GetMaxGreyValue(){
+        return this.maxGreyValue;
     }
 }
 
 class PortablePixelMap extends PortableImageMap{
     constructor(magicNumber, width, height, maxColorValue, imageData){
 
+        this.maxColorValue = maxColorValue;
         super(magicNumber, width, height, imageData);
+    }
+
+    GetMaxColorValue(){
+        return this.maxColorValue;
     }
 }

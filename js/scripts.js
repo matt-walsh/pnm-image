@@ -34,8 +34,7 @@ function HandleFile(file){
 }
 
 function DrawImage(image){
-    console.log(image);
     canvasWriter = new CanvasWriter(context,10,image.GetWidth(),image.GetHeight());
-    canvasWriter.Draw(image.GetImageData());
+    canvasWriter.Draw(image);
 
 }
